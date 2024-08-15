@@ -1,35 +1,38 @@
 <?php
-
-$name = $_POST["name"];
-$email = $_POST["email"];
-$subject = $_POST["subject"];
-$message = $_POST["message"];
-
 require "vendor/autoload.php";
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
-$mail = new PHPMailer(true);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST["name"];
+    $email = $_POST["email"];
+    $subject = $_POST["subject"];
+    $message = $_POST["message"];
 
-//$mail->SMTPDebug = SMTP::DEBUG_SERVER;
+    $mail = new PHPMailer(true);
 
-$mail->isSMTP();
-$mail->SMTPAuth = true;
+    try {
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'omo88moses@gmail.com';
+        $mail->Password = 'eoia eqob myjq adil'; // Use environment variables instead
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
 
-$mail->Host = "smtp.gmail.com";
-$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-$mail->Port = 587;
+        // Recipients
+        $mail->setFrom($email, $name);
+        $mail->addAddress('omo88moses@gmail.com', 'Ogiki Moses'); // Add a recipient
 
-$mail->Username = "omo88moses@gmail.com";
-$mail->Password = "eoia eqob myjq adil";
+        // Content
+        $mail->Subject = $subject;
+        $mail->Body    = $message;
 
-$mail->setFrom($email, $name);
-$mail->addAddress("omo88moses@gmail.com", "Moses Ogiki");
-
-$mail->Subject = $subject;
-$mail->Body = $message;
-
-$mail->send();
-echo 'Message has been sent';
-
+        $mail->send();
+        echo json_encode(["status" => "success", "message" => "Your message has been sent successfully."]);
+    } catch (Exception $e) {
+        echo json_encode(["status" => "error", "message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"]);
+    }
+}

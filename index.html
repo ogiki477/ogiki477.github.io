@@ -674,8 +674,7 @@
             <textarea class="form-control" name="message" rows="10" id="message" required></textarea>
           </div>
           <div class="my-3">
-            <div class="loading">Loading...</div>
-            <div class="error-message"></div>
+            
             <div class="sent-message">Your message has been sent. Thank you!</div>
           </div>
           <div class="text-center">
@@ -723,6 +722,29 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  <script>document.querySelector('.php-email-form').addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    const formData = new FormData(event.target);
+    const response = await fetch(event.target.action, {
+        method: 'POST',
+        body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+        document.querySelector('.sent-message').innerText = result.message;
+        document.querySelector('.sent-message').style.display = 'block';
+        document.querySelector('.error-message').style.display = 'none';
+    } else {
+        document.querySelector('.error-message').innerText = result.message;
+        document.querySelector('.error-message').style.display = 'block';
+        document.querySelector('.sent-message').style.display = 'none';
+    }
+});
+</script>
 
 </body>
 
